@@ -36,14 +36,23 @@ const EXTRAS = {
   x4: { branch: "Fresh Start", description: "Reinvention takes courage—your journey is unique.", color: "#8629dd90" }
 };
 
-
-// PUBLIC_INTERFACE
-function PathSelector({ onSelectPath }) {
+/*
+  PUBLIC_INTERFACE
+  PathSelector now receives simConfig which is the simulation configuration/state passed from Home.
+  This can be used for branching logic or context-aware display in the future.
+*/
+function PathSelector({ simConfig, onSelectPath }) {
   // Step state: flow is deterministic for demo, real version would serialize all choices
   const [flow, setFlow] = useState(["start"]);
   const [completed, setCompleted] = useState(false);
   const current = flow[flow.length - 1];
   const pathData = PATHS.find(p => p.id === current);
+
+  // simConfig is not yet used by the demo logic,
+  // but will be needed to adapt path branching by user's Home choices.
+  // For now, we leave it accessible here for future integration.
+  // Example:
+  //   simConfig.whatIf, simConfig.career, simConfig.relationship, ...
 
   function handleChoice(choice) {
     setFlow(f => [...f, choice.next]);

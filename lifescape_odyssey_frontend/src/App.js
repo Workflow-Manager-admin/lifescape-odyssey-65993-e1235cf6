@@ -226,6 +226,7 @@ function App() {
     if (page === "path") {
       return (
         <PathSelector
+          simConfig={simConfig}
           onSelectPath={pathTag => {
             setSelectedPathTag(pathTag);
             setPage("story");
