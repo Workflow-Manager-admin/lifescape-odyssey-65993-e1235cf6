@@ -1,0 +1,4 @@
+{
+    "command": "PORT=<port> BROWSER=none npm start",
+    "working_directory": "/home/kavia/workspace/code-generation/lifescape-odyssey-65993-e1235cf6/lifescape_odyssey_frontend"
+}
