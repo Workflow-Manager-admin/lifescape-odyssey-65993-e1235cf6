@@ -1,6 +1,4 @@
-//
 // Main container for LifeScape Odyssey app
-//
 import React, { useEffect, useRef, useState, Suspense, lazy } from "react";
 import "./App.css";
 
@@ -176,7 +174,7 @@ function TransitionWrapper({ children, pageKey }) {
 
 // PUBLIC_INTERFACE - Main container
 function App() {
-  // Inject our custom fonts (Orbitron, Space Mono, Inter, Lato)
+  // Inject custom fonts (Orbitron, Space Mono, Inter, Lato)
   useEffect(() => {
     const ln = document.createElement("link");
     ln.rel = "stylesheet";
@@ -185,12 +183,15 @@ function App() {
     return () => document.head.removeChild(ln);
   }, []);
 
-  // Navigation state
+  // Master state for navigation and simulation info
   const [page, setPage] = useState("home");
-  // Music toggle state
   const [musicOn, setMusicOn] = useState(false);
 
-  // Handle keyboard navigation (just for accessibility/immersion)
+  // Simulation state propagated between Home->PathSelector->Story Chamber
+  const [simConfig, setSimConfig] = useState({});
+  const [selectedPathTag, setSelectedPathTag] = useState("");
+
+  // Handle keyboard navigation (accessibility/immersion)
   useEffect(() => {
     function handleKeys(e) {
       if (e.altKey || e.metaKey) return;
@@ -210,8 +211,41 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeys);
   }, []);
 
-  const found = PAGES.find((p) => p.key === page) || PAGES[0];
-  const PageComponent = found.component;
+  // Render mapping with props passing
+  const renderPage = () => {
+    if (page === "home") {
+      return (
+        <Home
+          onBeginSimulation={(cfg) => {
+            setSimConfig(cfg);
+            setPage("path");
+          }}
+        />
+      );
+    }
+    if (page === "path") {
+      return (
+        <PathSelector
+          onSelectPath={pathTag => {
+            setSelectedPathTag(pathTag);
+            setPage("story");
+          }}
+        />
+      );
+    }
+    if (page === "dashboard") {
+      return <Dashboard />;
+    }
+    if (page === "story") {
+      return (
+        <StoryChamber lastPathTag={selectedPathTag} />
+      );
+    }
+    if (page === "vault") {
+      return <TimelineVault />;
+    }
+    return <Home />;
+  };
 
   return (
     <div className="lsodyssey-app" style={{ fontFamily: "Inter, Lato, sans-serif" }}>
@@ -279,7 +313,7 @@ function App() {
       >
         <Suspense fallback={<div className="container" style={{ marginTop: 64, textAlign: "center", color: "#0ff" }}>Loading...</div>}>
           <TransitionWrapper pageKey={page}>
-            <PageComponent />
+            {renderPage()}
           </TransitionWrapper>
         </Suspense>
       </main>
